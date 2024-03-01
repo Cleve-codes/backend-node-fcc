@@ -32,9 +32,15 @@ app.post('/api/shorturl', async function(req, res) {
   const inputUrl = req.body.url;
 
   try {
-    const { hostname } = urlparser.parse(inputUrl);
+    const parsedUrl = urlparser.parse(inputUrl);
+
+    // Check if the URL is in the correct format
+    if (!parsedUrl.protocol || !parsedUrl.hostname) {
+      throw 'invalid url';
+    }
+
     await new Promise((resolve, reject) => {
-      dns.lookup(hostname, (err, address) => {
+      dns.lookup(parsedUrl.hostname, (err, address) => {
         if (err) {
           reject('invalid url');
         } else {
